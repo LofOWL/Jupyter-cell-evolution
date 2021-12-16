@@ -1,5 +1,5 @@
-from RepoNotebooks import TEST_OUTPUT
-
+from Data import TEST_REPO
+from RepoNotebooks import RepoNotebook
 
 def mapping(output):
     notebook_mapping = dict()
@@ -27,8 +27,8 @@ def mapping(output):
     for rename in rename_notebook:
         commits = []
         for i in rename:
-            print(i)
-            commits += notebook_mapping[i]
+            commit  = notebook_mapping.get(i)
+            if commit: commits += commit 
         output.append((rename[-1],commits))
 
     # all the rename notebooks 
@@ -41,6 +41,8 @@ def mapping(output):
     return dict(output),dict(notebook_mapping)
 
 if __name__ == "__main__":
+    rpn = RepoNotebook(TEST_REPO)
+    TEST_OUTPUT = rpn.all_notebooks()
     print("NoteBookMapping")
     for i in TEST_OUTPUT: print(i)
     result = mapping(TEST_OUTPUT)

@@ -9,6 +9,8 @@ REPO_PATH = '/media/lofowl/My Passport/1353_notebook_projects'
 
 REPOS = os.listdir(REPO_PATH)
 
+REPOS_PATH = [getRepoPath(i) for i in REPOS]
+
 TEST_REPO = getRepoPath(REPOS[0])
 
 if __name__ == "__main__":

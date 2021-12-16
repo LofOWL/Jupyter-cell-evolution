@@ -8,6 +8,10 @@ MERGE = lambda notebooks,time,commit: [[commit,time]+notebook for notebook in no
 
 class RepoNotebook(Repo.Repo):
 
+    def __init__(self,path):
+        super().__init__(path)
+        self.id = str(hash(self.path))[1:13]
+
     def all_notebooks_commits(self):
         output = subprocess.getoutput('git log --pretty=%H --follow *.ipynb')
         return output.split("\n")
@@ -22,7 +26,7 @@ class RepoNotebook(Repo.Repo):
     def get_commit_time(self,commit):
         output = subprocess.getoutput(f'git show -s --format=%ci {commit}')
         output = output[:-6]
-        output = datetime.strptime(output,"%Y-%m-%d %H:%M:%S")
+        #output = datetime.strptime(output,"%Y-%m-%d %H:%M:%S")
         return output 
 
 
@@ -34,13 +38,11 @@ class RepoNotebook(Repo.Repo):
             time = self.get_commit_time(commit)
             output += MERGE(notebooks,time,commit)
         return output
-
-rpn = RepoNotebook(TEST_REPO)
-TEST_OUTPUT = rpn.all_notebooks()
  
 if __name__ == "__main__":
     rpn = RepoNotebook(TEST_REPO)
-    all_notebooks(rpn)
-
+    rpn.all_notebooks()
+    print(rpn.id)
+    
 
     
