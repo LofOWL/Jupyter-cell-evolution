@@ -10,7 +10,7 @@ def count_missing(path):
     total = max(all_new_cells) + 1
     new_cell = len([i for i in mapping if i[0] == "None"])
 
-    return total,new_cell, new_cell / total 
+    return total,new_cell,total / new_cell
 
 if __name__ == "__main__":
     print("Research Question 2")
@@ -18,4 +18,3 @@ if __name__ == "__main__":
     all_mapping = os.listdir(mapping_cache)
 
     a,b,c = count_missing(f'{mapping_cache}/{all_mapping[0]}')
-    print(f'{a} {b} {c}')
