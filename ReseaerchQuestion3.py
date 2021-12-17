@@ -41,34 +41,32 @@ def cellmapping(commits,path):
     cellmappings = [CellMapping(f'{path}/{commit}') for commit in commits ] 
     return cellmappings
 
+expand_start = lambda x: [-1 for _ in range(x)]
+
 def cell_evolution_main(name,commits,path):
     mappings = cellmapping(commits,path)
-    cell_evolution = []
+    cell_evolution = list()
     input_cells = mappings[0].old_cells
     for i in range(len(mappings)):
-        mapping = mappings[i]
-        cell_evolution += cell_evolution_get(input_cells,mappings[i:],i,len(mappings))        
-        input_cells = mapping.insert_cells
-
+        for cell in input_cells:
+            tmp_cell_evolution = list()
+            for output in cell_evolution_all(cell,mappings[i:],len(mappings),i):
+                tmp_cell_evolution.append(expand_start(i) + [cell]+output)
+            cell_evolution += tmp_cell_evolution
+        input_cells = mappings[i].insert_cells
+    
     for i in cell_evolution: print(i)
 
-def cell_evolution_get(cells,mappings,start,end):
-    result_path = []
-    for cell in cells:
-        # expand the missing index
-        oc = [-1 for _ in range(start)] + [cell]
-        pointer = cell
-        for mapping in mappings:
-            result = mapping.map(pointer)
-            if result[0] != "None":
-                oc.append(result[0])
-                pointer = result[0]
-            else:
-                # complete the missing index
-                oc = oc + [-1 for _ in range(end - len(oc)+1)]
-                break
-        result_path.append(oc)
-    return result_path
+def cell_evolution_all(pointer,mappings,end,count):
+    output = list()
+    if not mappings: return [[-1 for _ in range(end-count)]]
+    result = mappings[0].map(pointer)
+    if result[0] == 'None': return [[-1 for _ in range(end-count)]] 
+    for re in result:
+        re_output = cell_evolution_all(re,mappings[1:],end,count+1)
+        re_output = [[re]+i for i in re_output] if re_output else [[re]]
+        output += re_output
+    return output
 
 if __name__ == "__main__":
     print("Research Question 3")
@@ -79,7 +77,8 @@ if __name__ == "__main__":
     names_group = group(path,names)
 
     print(names_group)
-    example = list(names_group.items())[1]
+    example = [i for i in list(names_group.items()) if i[0] == 'graphics#graphics'][0]
+    print(example)
     cell_evolution_main(example[0],example[1],mapping_cache_path)
 
  
