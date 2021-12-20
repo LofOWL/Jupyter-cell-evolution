@@ -10,7 +10,6 @@ class RepoNotebook(Repo.Repo):
 
     def __init__(self,path):
         super().__init__(path)
-        self.id = str(hash(self.path))[1:13]
 
     def all_notebooks_commits(self):
         output = subprocess.getoutput('git log --pretty=%H --follow *.ipynb')

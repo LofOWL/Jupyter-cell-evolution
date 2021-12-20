@@ -8,3 +8,5 @@ from notebook import Notebook
 CURRENT_FILE = os.path.dirname(os.path.abspath(__file__))
 
 SAVE_FOLDER = '/media/lofowl/My Passport/CISC834'
+
+SPLIT = "@$"

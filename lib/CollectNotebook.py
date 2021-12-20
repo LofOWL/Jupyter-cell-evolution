@@ -6,12 +6,6 @@ import os
 
 name = lambda commit,notebook_name: f"{commit}_{notebook_name.replace('/','#')}"
 
-def check(clean,commit):
-    for notebook,commits in clean.items():
-        if commit in commits:
-            return notebook
-    raise Exception("commit not exists")
-
 def save(rpn,notebook,commit):
     target = f'{rpn.path}/{notebook}'
     destination = f'{SAVE_FOLDER}/notebook_cache/{name(commit,notebook)}'

@@ -2,16 +2,14 @@ from sys import meta_path
 print(__name__)
 if __name__ == "__main__":
     from CellMapping import CellMapping
+    from Config import SPLIT
 else:
     from lib.CellMapping import CellMapping
+    from lib.Config import SPLIT
 import os
 
-def extractId(id):
-    id = id.split("$")[-1].split(".")[0]
-    return id
-
 def extractName(name):
-    name = name.split("$")[1].split("_")[-1]
+    name = name.split(SPLIT)[1].split("_")[-1]
     return name
 
 def extractIndex(index):
@@ -73,21 +71,20 @@ def cell_evolution_all(pointer,mappings,end,count):
 
 def show(output):
     for i in output:
-        print('{} {:<5} {:<5} {:<5} {:<5} {:<5} {:<5}\n'.format(*i))
+        print('{} {:<5} {:<5} {:<5} {:<5} {:<5}\n'.format(*i))
         
 if __name__ == "__main__":
-    from Config import CURRENT_FILE
+    from Config import CURRENT_FILE,SAVE_FOLDER
     from CellEvolutionAnalyser import CellEvolutionAnalyser
-    mapping_cache_path = f'{CURRENT_FILE}/mapping_cache'
+    mapping_cache_path = f'{SAVE_FOLDER}/mapping_cache'
     path = os.listdir(f'{mapping_cache_path}')
 
     names = all_names(path)
     names_group = group(path,names)
 
-    print(names_group)
     example = [i for i in list(names_group.items()) if i[0] == 'graphics#graphics'][0]
-    print(example)
     output = cell_evolution_main(example[0],example[1],mapping_cache_path)
+    show(output)
     ce = CellEvolutionAnalyser(output)
     output = ce.cell_dependents() 
     show(output)

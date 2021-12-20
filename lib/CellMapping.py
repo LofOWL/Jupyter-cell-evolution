@@ -47,7 +47,7 @@ class CellMapping:
         split_list,cache = list(),list()
         for mapping in self.mappings:
             old_cell,new_cell = mapping[0],mapping[1:]
-            if len(new_cell) == 1:
+            if len(new_cell) == 1 and new_cell[0] != "None":
                 if new_cell[0] not in cache:
                     cache.append(new_cell[0])
                 else:
@@ -60,11 +60,12 @@ class CellMapping:
             old_cell = int(old_cell)
             new_cells = self.map(old_cell) 
             for new_cell in new_cells:
-                new_cell = int(new_cell) if str(new_cell)[-1] != 'm' else int(new_cell[:-1])
-                pre_new_cells = [str(i) for i in range(new_cell)]
-                pre_new_cells_map = [int(self.mapNew(i)) for i in pre_new_cells if self.mapNew(i) != "None"]
-                if not all(old_cell > i for i in pre_new_cells_map):
-                    move_list.append([old_cell]+new_cells)
+                if new_cell != "None":
+                    new_cell = int(new_cell) if str(new_cell)[-1] != 'm' else int(new_cell[:-1])
+                    pre_new_cells = [str(i) for i in range(new_cell)]
+                    pre_new_cells_map = [int(self.mapNew(i)) for i in pre_new_cells if self.mapNew(i) != "None"]
+                    if not all(old_cell > i for i in pre_new_cells_map):
+                        move_list.append([old_cell]+new_cells)
         return move_list
                 
 

@@ -1,50 +1,52 @@
-from NoteBookMapping import mapping
+from NoteBookMapping import mapping,group
+from CheckRepo import RepoCheck
 from RepoNotebooks import RepoNotebook
-from Data import TEST_REPO
+from Data import TEST_REPO,REPOS
 from CollectNotebook import name
+from Config import CURRENT_FILE,Notebook,CellMapping,SPLIT,SAVE_FOLDER
 
-from Config import CURRENT_FILE,Notebook,CellMapping
+mapping_name = lambda x,y,index : f'{index}{SPLIT}{x}{SPLIT}{y}.txt'
 
-mapping_name = lambda x,y,index,id : f'{index}${x}${y}${id}.txt'
+class CollectMapping:
 
-def saveMapping(output,old_path,new_path,index,id):
-    name = lambda x: x.split("/")[-1].split(".")[0]
-    mname = mapping_name(name(old_path),name(new_path),index,id)
-    with open(f'{CURRENT_FILE}/mapping_cache/{mname}','w') as file:
-        for i in output:
-            if type(i[1]) != list:
-                file.write(f'{i[0]},{i[1]}\n')
-            else:
-                if len(i[1]) == 1:
-                    file.write(f'{i[0]},{i[1][0]}m\n')
+    def __init__(self,repo_check:RepoCheck):
+        self.repo_check = repo_check
+
+    def saveMapping(self,output,old_path,new_path,index):
+        name = lambda x: x.split("/")[-1].split(".")[0]
+        mname = mapping_name(name(old_path),name(new_path),index)
+        print(output)
+        with open(f'{SAVE_FOLDER}/mapping_cache/{mname}','w') as file:
+            for i in output:
+                if type(i[1]) != list:
+                    file.write(f'{i[0]},{i[1]}\n')
                 else:
-                    file.write(f'{i[0]},{",".join(i[1])}\n')
+                    if len(i[1]) == 1:
+                        file.write(f'{i[0]},{i[1][0]}m\n')
+                    else:
+                        file.write(f'{i[0]},{",".join(i[1])}\n')
 
-def getMapping(notebook_name,commits,id):
-    i,j = 0,1
-    mapping_output = list()
-    index = 0
-    while j < len(commits):
-        old_path = f'{CURRENT_FILE}/cache/{name(commits[i],notebook_name)}'
-        new_path = f'{CURRENT_FILE}/cache/{name(commits[j],notebook_name)}'
-        old,new = Notebook(old_path),Notebook(new_path)
-        output = CellMapping(old,new)
-        mapping_output.append(output)
-        saveMapping(output,old_path,new_path,index,id)
-        i += 1
-        j += 1
-        index += 1
-    return mapping_output
+    def getMapping(self,version):
+        i,j = 0,1
+        index = 0
+        while j < len(version):
+            old_path = f'{self.repo_check.notebook_cache_path}/{name(version[i][1],version[i][0])}'
+            new_path = f'{self.repo_check.notebook_cache_path}/{name(version[j][1],version[j][0])}'
+            old,new = Notebook(old_path),Notebook(new_path)
+            output = CellMapping(old,new)
+            self.saveMapping(output,old_path,new_path,index)
+            i += 1
+            j += 1
+            index += 1
 
-def main(output,id):
-    mapping_output = list()
-    for notebook_name,commits in output.items():
-        mapping_output += getMapping(notebook_name,commits,id)
+    def run(self):
+        _,_,output = group(self.repo_check.data())
+        for i in output:
+            print(i)
+            self.getMapping(i)
 
 if __name__ == "__main__":
-    rpn = RepoNotebook(TEST_REPO)
-    output = rpn.all_notebooks()
-    clean,_ = mapping(output)
-    print(clean)
-
-    main(clean,rpn.id)
+    print(REPOS[0])
+    rpn = RepoCheck(REPOS[0])
+    cm = CollectMapping(rpn)
+    cm.run()
