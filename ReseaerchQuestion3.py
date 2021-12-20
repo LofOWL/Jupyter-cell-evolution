@@ -8,7 +8,8 @@ import os
 def show(output):
     for i in output:
         print('{} {:<5} {:<5} {:<5} {:<5} {:<5} {:<5}\n'.format(*i))
-        
+
+
 if __name__ == "__main__":
     print("Research Question 3")
     mapping_cache_path = f'{CURRENT_FILE}/mapping_cache'
@@ -21,6 +22,7 @@ if __name__ == "__main__":
     example = [i for i in list(names_group.items()) if i[0] == 'graphics#graphics'][0]
     print(example)
     output = cell_evolution_main(example[0],example[1],mapping_cache_path)
+    show(output)
     ce = CellEvolutionAnalyser(output)
     output = ce.cell_dependents() 
     show(output)

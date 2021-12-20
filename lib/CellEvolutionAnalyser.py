@@ -1,5 +1,3 @@
-
-
 class CellEvolutionAnalyser:
 
     def __init__(self,alists=[]):

@@ -9,6 +9,8 @@ class Repo:
         self.path = path
         self.set_environment()
         self.set_master()
+        self.remove_lock()
+        print("init success")
 
     def checkout(self,commit):
         os.system(f'git checkout -f {commit}')        
@@ -24,6 +26,11 @@ class Repo:
     def current_path(self):
         os.system('pwd')
         return subprocess.getoutput('pwd')
+
+    def remove_lock(self):
+        assert self.current_path() == self.path, "Is not in the repo"
+        os.system(f'rm -r "{self.path}/.git/index.lock"')
+        print('remove lock')
 
 if __name__ == "__main__":
 
