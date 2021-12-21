@@ -1,4 +1,5 @@
 import os
+from Data import IDENTICAL,MERGE,MODIFIED,MOVE,SPLIT
 
 class CellMapping:
 
@@ -25,7 +26,6 @@ class CellMapping:
                 return oc[1:]
         return 'None'
 
-
     def mapNew(self,new_cell):
         for oc in self.mappings:
             if any(new_cell in nc for nc in oc[1:]):
@@ -33,10 +33,10 @@ class CellMapping:
         return 'None'
 
     def identical(self):
-        return [mapping for mapping in self.mappings if mapping[0] != "None" and len(mapping[1:]) == 1 and 'm' not in mapping[1]]
+        return [mapping for mapping in self.mappings if len(mapping) == 2 and 'm' not in mapping[1][-1] and mapping[1] != "None"]
 
     def modified(self):
-        return [mapping for mapping in self.mappings if mapping[0] != "None" and len(mapping[1:]) == 1 and 'm' in mapping[1]]
+        return [mapping for mapping in self.mappings if len(mapping) == 2 and 'm' in mapping[1][-1] and mapping[1] != "None"]
 
     def add(self):
         return [mapping for mapping in self.mappings if mapping[0] == "None"] 
@@ -73,12 +73,29 @@ class CellMapping:
                     if not all(old_cell > i for i in pre_new_cells_map):
                         move_list.append([old_cell]+new_cells)
         return move_list
-                
 
+    def cell_change_type(self):
+        cct = {i:None for i in self.old_cells}
+
+        identical = [i[0] for i in self.identical()]
+        modified = [i[0] for i in self.modified()]
+        move = [i[0] for i in self.move()]
+        merge = [i[0] for i in self.merge()]
+        split = [i[0] for i in self.split()]
+        for i in self.old_cells:
+            if i in merge: cct[i] = MERGE
+            elif i in split: cct[i] = SPLIT
+            elif i in move: cct[i] = MOVE
+            elif i in modified: cct[i] = MODIFIED
+            elif i in identical: cct[i] = IDENTICAL
+
+        return cct 
 
 if __name__ == "__main__":
-    from Config import SAVE_FOLDER
-    mapping_path = SAVE_FOLDER + '/mapping_cache'
-    cm = CellMapping(f'{mapping_path}/15@$61a830c36bd1e8c69697a57ae614c9b6900598b7_examples#reflectometry@$302e717b05b54ebe3bebc9966b80a4ca977efa32_examples#reflectometry.txt')
+    from Config import SAVE_FOLDER,CURRENT_FILE
+    mapping_path = CURRENT_FILE + '/mapping_cache'
+    cm = CellMapping(f'{mapping_path}/1@$376b094aa6a3f4572774e15e7659af9eb82981b3_graphics#graphics@$8336e016614e784c0ca8820574798ab3e8606732_graphics#graphics.txt')
     cm.show()
-    print(cm.merge())
+    cm.cell_change_type()
+
+    

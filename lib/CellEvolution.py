@@ -1,11 +1,6 @@
-from sys import meta_path
-print(__name__)
-if __name__ == "__main__":
-    from CellMapping import CellMapping
-    from Config import SPLIT
-else:
-    from lib.CellMapping import CellMapping
-    from lib.Config import SPLIT
+from CellMapping import CellMapping
+from Config import SPLIT
+from Utils import get_mappings
 import os
 
 def extractName(name):
@@ -16,36 +11,10 @@ def extractIndex(index):
     index = index[0]
     return index
 
-def all_names(name):
-    names = [extractName(i) for i in name]
-    names = set(names)
-    names = list(names)
-    return names 
-
-def group(path,names):
-    names = {name:[] for name in names}
-    # group up the names
-    for p in path:
-        name = extractName(p)
-        if names.get(name):
-            names[name] = names[name] + [p]
-        else:
-            names[name] = [p]
-
-    # sort the commit list
-    for _,commits in names.items():
-        commits.sort(key=lambda x: x[0])
-
-    return names
-
-def cellmapping(commits,path):
-    cellmappings = [CellMapping(f'{path}/{commit}') for commit in commits ] 
-    return cellmappings
-
 expand_start = lambda x: [-1 for _ in range(x)]
 
-def cell_evolution_main(name,commits,path):
-    mappings = cellmapping(commits,path)
+def cell_evolution_main(name,mappings):
+    mappings = mappings
     cell_evolution = list()
     input_cells = mappings[0].old_cells
     for i in range(len(mappings)):
@@ -69,23 +38,24 @@ def cell_evolution_all(pointer,mappings,end,count):
         output += re_output
     return output
 
-def show(output):
-    for i in output:
-        print('{} {:<5} {:<5} {:<5} {:<5} {:<5}\n'.format(*i))
-        
 if __name__ == "__main__":
     from Config import CURRENT_FILE,SAVE_FOLDER
+    from CheckRepo import RepoCheck
     from CellEvolutionAnalyser import CellEvolutionAnalyser
-    mapping_cache_path = f'{SAVE_FOLDER}/mapping_cache'
-    path = os.listdir(f'{mapping_cache_path}')
+    rc = RepoCheck('frnsys#ai_notes')
+    _,_,output = rc.group()
 
-    names = all_names(path)
-    names_group = group(path,names)
+    mapping_cache_path = f'{CURRENT_FILE}/mapping_cache'
+    mappings = os.listdir(f'{mapping_cache_path}')
 
-    example = [i for i in list(names_group.items()) if i[0] == 'graphics#graphics'][0]
-    output = cell_evolution_main(example[0],example[1],mapping_cache_path)
-    show(output)
+    mapping_names,names = get_mappings(output[0])
+    '''
+    graphics#graphics
+    ['1@$376b094aa6a3f4572774e15e7659af9eb82981b3_graphics#graphics@$8336e016614e784c0ca8820574798ab3e8606732_graphics#graphics.txt', '2@$8336e016614e784c0ca8820574798ab3e8606732_graphics#graphics@$5d3bd8305653daca3ece76a60d3162bf70da0bb2_graphics#graphics.txt', '3@$5d3bd8305653daca3ece76a60d3162bf70da0bb2_graphics#graphics@$759f9bb740cfbb272f1b35dfc78f918f89b68674_graphics#graphics.txt', '4@$759f9bb740cfbb272f1b35dfc78f918f89b68674_graphics#graphics@$ac60e19a29d7fddd38418441f110d1437a7cb0e4_graphics#graphics.txt', '5@$ac60e19a29d7fddd38418441f110d1437a7cb0e4_graphics#graphics@$87d848d425ed907e85b194b5c0f896e4a153bee9_graphics#graphics.txt']
+    '''
+    mappings = [CellMapping(f'{mapping_cache_path}/{mapping_name}') for mapping_name in mapping_names] 
+    output = cell_evolution_main(names,mappings)
+    for i in output: print(i) 
     ce = CellEvolutionAnalyser(output)
     output = ce.cell_dependents() 
-    show(output)
  

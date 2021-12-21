@@ -13,6 +13,9 @@ REPOS_PATH = [getRepoPath(i) for i in REPOS]
 
 TEST_REPO = getRepoPath(REPOS[0])
 
+IDENTICAL,MOVE,MERGE,SPLIT,MODIFIED,NONE = "I","V","G","S","M","N"
+
+
 if __name__ == "__main__":
     repo = REPOS[0]
 

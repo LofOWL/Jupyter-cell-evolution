@@ -13,10 +13,9 @@ class CollectMapping:
         self.repo_check = repo_check
 
     def saveMapping(self,output,old_path,new_path,index):
-        name = lambda x: x.split("/")[-1].split(".")[0]
+        name = lambda x: x.split("/")[-1].split(".")[0][:63]
         mname = mapping_name(name(old_path),name(new_path),index)
-        print(output)
-        with open(f'{SAVE_FOLDER}/mapping_cache/{mname}','w') as file:
+        with open(f'{CURRENT_FILE}/mapping_cache/{mname}','w') as file:
             for i in output:
                 if type(i[1]) != list:
                     file.write(f'{i[0]},{i[1]}\n')
@@ -24,7 +23,7 @@ class CollectMapping:
                     if len(i[1]) == 1:
                         file.write(f'{i[0]},{i[1][0]}m\n')
                     else:
-                        file.write(f'{i[0]},{",".join(i[1])}\n')
+                        file.write(f'{i[0]},{",".join([str(j) for j in i[1]])}\n')
 
     def getMapping(self,version):
         i,j = 0,1
@@ -42,11 +41,9 @@ class CollectMapping:
     def run(self):
         _,_,output = group(self.repo_check.data())
         for i in output:
-            print(i)
             self.getMapping(i)
-
+            
 if __name__ == "__main__":
-    print(REPOS[0])
-    rpn = RepoCheck(REPOS[0])
+    rpn = RepoCheck('frnsys#ai_notes')
     cm = CollectMapping(rpn)
     cm.run()

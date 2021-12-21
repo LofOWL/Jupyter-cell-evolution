@@ -49,7 +49,7 @@ def mapping(output):
 
 
 def group(data):
-    convert_data = [[i[0],i[1],i[5],i[3]] if 'R' not in i[5] else [i[0],i[1],i[5],i[3],i[4]] for i in np.array(data)]
+    convert_data = [[i[0],i[1],i[5],i[3]] if 'R' not in i[5] else [i[0],i[1],i[5],i[3],i[4]] for i in np.array(data) if 'D' not in i[5]]
     return mapping(convert_data)
 
 if __name__ == "__main__":
