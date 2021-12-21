@@ -10,6 +10,10 @@ class CellMapping:
         self.old_cells = [i[0] for i in self.mappings if i[0] != "None"]
         self.insert_cells = [i[1] for i in self.mappings if i[0] == "None"]
 
+    def show(self):
+        for mapping in self.mappings:
+            print(mapping)
+
     def convert2int(self,astr):
         return int(astr) if str(astr)[-1] != "m" else int(str(astr)[:-1])
 
@@ -40,19 +44,21 @@ class CellMapping:
     def deleted(self):
         return [mapping for mapping in self.mappings if mapping[1] == "None"] 
 
-    def merge(self):
+    def split(self):
         return [mapping for mapping in self.mappings if mapping[0] != "None" and len(mapping[1:]) >= 2] 
 
-    def split(self):
-        split_list,cache = list(),list()
+    def merge(self):
+        convert = lambda x: (str(x) if 'm' not in x[-1] else str(x[:-1]))
+        merge_list,cache = list(),list()
         for mapping in self.mappings:
-            old_cell,new_cell = mapping[0],mapping[1:]
-            if len(new_cell) == 1 and new_cell[0] != "None":
-                if new_cell[0] not in cache:
-                    cache.append(new_cell[0])
-                else:
-                    split_list.append(new_cell[0])
-        return [i for i in self.mappings if len(i[1:]) == 1 and i[1] in split_list]
+            old_cell,new_cells = mapping[0],mapping[1:]
+            for new_cell in new_cells:
+                if new_cell != "None":
+                    if not any(convert(new_cell) == convert(i) for i in cache):
+                        cache.append(new_cell)
+                    else:
+                        merge_list.append(new_cell)
+        return [i for i in self.mappings if any(convert(i) == convert(j) for i in i[1:] for j in merge_list)]
 
     def move(self):
         move_list = list()
@@ -71,11 +77,8 @@ class CellMapping:
 
 
 if __name__ == "__main__":
-    from Config import CURRENT_FILE
-    mapping_cache_path = f'{CURRENT_FILE}/mapping_cache'
-    mappings = os.listdir(mapping_cache_path)
-    mapping = mappings[0]
-    cm = CellMapping(f'{mapping_cache_path}/{mapping}')
-
-    id,mo,add,dele,merge,split,move = cm.identical(),cm.modified(),cm.add(),cm.deleted(),cm.merge(),cm.split(),cm.move()
-    print(f'{id}\n{mo}\n{add}\n{dele}\n{merge}\n{split}\n{move}')
+    from Config import SAVE_FOLDER
+    mapping_path = SAVE_FOLDER + '/mapping_cache'
+    cm = CellMapping(f'{mapping_path}/15@$61a830c36bd1e8c69697a57ae614c9b6900598b7_examples#reflectometry@$302e717b05b54ebe3bebc9966b80a4ca977efa32_examples#reflectometry.txt')
+    cm.show()
+    print(cm.merge())
