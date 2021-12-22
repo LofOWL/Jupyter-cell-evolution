@@ -2,32 +2,26 @@
 Research Question 3
 How frequently each type of cell-level change happens in the notebook file history?
 '''
-from sys import meta_path
-from lib.CellEvolution import all_names,group,cell_evolution_main
-from lib.Config import CURRENT_FILE
-from lib.CellEvolutionAnalyser import CellEvolutionAnalyser
 import os
+import sys
+sys.path.insert(1,"/home/lofowl/Desktop/CISC834/project/Jupyter-cell-evoluation/lib")
 
-
-def show(output):
-    for i in output:
-        print('{} {:<5} {:<5} {:<5} {:<5} {:<5} {:<5}\n'.format(*i))
+from CheckRepo import RepoCheck
+from Config import CURRENT_FILE
+from Utils import get_mappings
+from CellMapping import CellMapping
+from CellTypeSequence import CellSequence
 
 
 if __name__ == "__main__":
     print("Research Question 3")
+    rc = RepoCheck('frnsys#ai_notes')
+    _,_,output = rc.group()
+
     mapping_cache_path = f'{CURRENT_FILE}/mapping_cache'
-    path = os.listdir(f'{mapping_cache_path}')
+    mappings = os.listdir(f'{mapping_cache_path}')
 
-    names = all_names(path)
-    names_group = group(path,names)
-
-    print(names_group)
-    example = [i for i in list(names_group.items()) if i[0] == 'graphics#graphics'][0]
-    print(example)
-    output = cell_evolution_main(example[0],example[1],mapping_cache_path)
-    show(output)
-    ce = CellEvolutionAnalyser(output)
-    output = ce.cell_dependents() 
-    show(output)
- 
+    mapping_names,names = get_mappings(output[0])
+    mappings = [CellMapping(f'{mapping_cache_path}/{mapping_name}') for mapping_name in mapping_names] 
+    output = CellSequence(mappings)
+    for i in output: print(i)

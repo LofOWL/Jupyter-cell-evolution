@@ -1,5 +1,6 @@
 import os
 from Data import IDENTICAL,MERGE,MODIFIED,MOVE,SPLIT
+from Utils import convert
 
 class CellMapping:
 
@@ -9,6 +10,7 @@ class CellMapping:
             mappings = file.read().split("\n")[:-1]
         self.mappings = [i.split(",") for i in mappings] 
         self.old_cells = [i[0] for i in self.mappings if i[0] != "None"]
+        self.new_cells = [j for i in self.mappings if i[1] != "None" for j in i[1:]]
         self.insert_cells = [i[1] for i in self.mappings if i[0] == "None"]
 
     def show(self):
@@ -33,7 +35,7 @@ class CellMapping:
         return 'None'
 
     def identical(self):
-        return [mapping for mapping in self.mappings if len(mapping) == 2 and 'm' not in mapping[1][-1] and mapping[1] != "None"]
+        return [mapping for mapping in self.mappings if len(mapping) == 2 and 'm' not in mapping[1][-1] and mapping[1] != "None" and mapping[0] != "None"]
 
     def modified(self):
         return [mapping for mapping in self.mappings if len(mapping) == 2 and 'm' in mapping[1][-1] and mapping[1] != "None"]
@@ -91,11 +93,44 @@ class CellMapping:
 
         return cct 
 
+    def modified_position(self):
+        old_cells_len = max([int(i) for i in self.old_cells]) + 1
+        new_cells_len = max([int(convert(i)) for i in self.new_cells]) + 1
+
+        identical = [int(i[0]) for i in self.identical()]
+        identical_position = [i/old_cells_len for i in identical]
+        
+        change = self.modified() + self.split() + self.merge() + self.move()
+        change = list(set([int(i[0]) for i in change]))
+        change_position = [i/old_cells_len for i in change]
+
+        modified = [int(i[0]) for i in self.modified()]
+        modified_position = [i/old_cells_len for i in modified]
+
+        split = [int(i[0]) for i in self.split()]
+        split_position = [i/old_cells_len for i in split]
+
+        merge = [int(i[0]) for i in self.merge()]
+        merge_position = [i/old_cells_len for i in merge]
+
+        move = [int(i[0]) for i in self.move()]
+        move_position = [i/old_cells_len for i in move]
+
+        add = [int(i[1]) for i in self.add()]
+        add_position = [i/new_cells_len for i in add]
+
+        delete = [int(i[0]) for i in self.deleted()]
+        delete_position = [i/old_cells_len for i in delete]
+
+        return identical_position,modified_position,split_position,merge_position,move_position,add_position,delete_position 
+
+
 if __name__ == "__main__":
     from Config import SAVE_FOLDER,CURRENT_FILE
     mapping_path = CURRENT_FILE + '/mapping_cache'
     cm = CellMapping(f'{mapping_path}/1@$376b094aa6a3f4572774e15e7659af9eb82981b3_graphics#graphics@$8336e016614e784c0ca8820574798ab3e8606732_graphics#graphics.txt')
     cm.show()
     cm.cell_change_type()
+    cm.modified_position()
 
     

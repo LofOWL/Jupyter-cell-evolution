@@ -81,6 +81,7 @@ class RepoCheck:
         all_mappings = list()
         for output in outputs:
             all_mappings += get_mappings(output)[0]
+        print(all_mappings)
         return [mapping in mapping_cache for mapping in all_mappings]
         
     def check_notebook(self):
@@ -113,10 +114,5 @@ def save(log):
 
 if __name__ == "__main__":
     rc = RepoCheck('18F#tech-talks')
-    output = rc.check_notebook()
-    print(output)
     output = rc.check_mapping()
     print(output)
-    print(rc.all_mapping_with_name())
-
-    total_all_mapping_with_name()

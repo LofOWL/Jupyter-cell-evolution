@@ -23,10 +23,10 @@ class CellEvolutionAnalyser:
         return len(set(alist)) == 1
 
     def is_identical(self,alist):
-        return all('m' not in i for i in alist)
+        return all('m' not in i if type(i) == str else False for i in alist )
 
     def is_exist_all(self,alist):
-        return len(i for i in alist if i != -1) == 0
+        return len([i for i in alist if i == -1]) == 0
 
     def is_exist_head(self,alist):
         return alist[0] != -1 and alist[-1] == -1
@@ -38,13 +38,15 @@ class CellEvolutionAnalyser:
         return alist[0] == -1 and alist[-1] == -1
 
     def len_modified(self,alist):
-        return len(i for i in alist if 'm' in i)
+        alist = [i for i in alist if i != -1]
+        return len([i for i in alist if 'm' in i])
 
     def len_position_change(self,alist):
         return len(set([i if i[-1] != 'm' else i[:-1] for i in alist if type(i) == str]))
 
     def len_exist(self,alist):
-        return len(i for i in alist if i != -1)
+        return len([i for i in alist if i != -1])
+
 
 if __name__ == "__main__":
     ce = CellEvolutionAnalyser()
